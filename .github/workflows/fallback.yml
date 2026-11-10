@@ -1,8 +1,8 @@
-name: Keepalive fallback
+﻿name: Keepalive fallback
 
 on:
   schedule:
-    - cron: "15 */6 * * *"
+    - cron: "15 * * * *"
   workflow_dispatch:
 
 permissions:

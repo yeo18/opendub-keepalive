@@ -1,4 +1,4 @@
-# OpenDub keepalive
+﻿# OpenDub keepalive
 
 Public, secret-free automation that keeps the OpenDub API awake between Render Free
 sleep cycles.
@@ -11,7 +11,7 @@ sleep cycles.
 - `keepalive.yml` pings the API every five minutes for about 4.5 hours, then
   re-dispatches itself through the GitHub API. The next run starts as soon as the
   current one ends, so the API never reaches Render's 15-minute sleep threshold.
-- `fallback.yml` runs every six hours and starts a keepalive run only if none is
+- `fallback.yml` runs every hour and starts a keepalive run only if none is
   already active. It covers a canceled or failed long run.
 - `heartbeat.yml` commits a timestamp once a month so GitHub does not disable
   scheduled workflows after 60 days of repository inactivity.
