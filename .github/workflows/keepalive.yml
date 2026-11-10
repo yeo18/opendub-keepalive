@@ -1,0 +1,52 @@
+name: Keep OpenDub API warm
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+    - cron: "0 0 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: keepalive
+  cancel-in-progress: false
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Wake and check the Render API
+        run: |
+          for attempt in 1 2 3; do
+            if curl --fail --silent --show-error --max-time 120 \
+              https://opendub-api.onrender.com/api/health; then
+              exit 0
+            fi
+            sleep 20
+          done
+          exit 1
+      - name: Check the public frontend proxy
+        continue-on-error: true
+        run: |
+          curl --fail --silent --show-error --max-time 120 \
+            https://opendub.vercel.app/api/health
+
+  heartbeat:
+    if: github.event.schedule == '0 0 1 * *'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update heartbeat
+        run: date -u +"%Y-%m-%dT%H:%M:%SZ" > heartbeat.txt
+      - name: Commit heartbeat
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add heartbeat.txt
+          git commit -m "chore: monthly heartbeat"
+          git push
